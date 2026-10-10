@@ -5,10 +5,11 @@
 //   última copia guardada.
 // - Drones, tipografía e íconos van "primero a lo guardado": casi no cambian y así cargan al
 //   instante. Si se cambia alguno, sube VERSION para que se vuelvan a descargar.
-const VERSION = "armonico-v2";
+const VERSION = "armonico-v3";
 const RECURSOS = [
   "./",
   "./index.html",
+  "./privacidad.html",
   "./manifest.webmanifest",
   "./drones/cello.mp3",
   "./drones/tanpura.mp3",
@@ -48,15 +49,16 @@ self.addEventListener("fetch", (e) => {
       // una copia vieja de su propia memoria y al editar y recargar no se veían los cambios
       fetch(req.url, { cache: "no-cache", credentials: "same-origin" })
         .then((resp) => {
-          // solo se guarda la página de la app y solo si llegó bien (nunca un error 404)
+          // se guarda solo si llegó bien (nunca un error 404); la app va bajo "./index.html"
           const ruta = new URL(req.url).pathname;
-          if (resp.ok && (ruta.endsWith("/") || ruta.endsWith("/index.html"))) {
+          if (resp.ok) {
+            const esApp = ruta.endsWith("/") || ruta.endsWith("/index.html");
             const copia = resp.clone();
-            caches.open(VERSION).then((c) => c.put("./index.html", copia));
+            caches.open(VERSION).then((c) => c.put(esApp ? "./index.html" : ruta, copia));
           }
           return resp;
         })
-        .catch(() => caches.match("./index.html"))
+        .catch(() => caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match("./index.html")))
     );
     return;
   }
