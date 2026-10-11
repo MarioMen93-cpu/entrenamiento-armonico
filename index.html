@@ -288,6 +288,33 @@
   .tab-sub { font-size: 13.5px; color: var(--text-dim); margin: 0 2px 4px; line-height: 1.5; }
   body[data-view="home"] .toast { bottom: calc(90px + env(safe-area-inset-bottom)); }
 
+  /* ---- Ejercicios ---- */
+  .ex-card { display: grid; grid-template-columns: 34px 1fr; gap: 4px 12px; padding: 14px; border-radius: 16px; background: var(--bg-2); margin-top: 10px; border: 1px solid rgba(255, 255, 255, .04); }
+  .ex-card .ex-ico { padding-top: 2px; }
+  .ex-card b { font-size: 15px; font-weight: 800; display: block; }
+  .ex-card span { font-size: 13px; color: var(--text-dim); line-height: 1.45; display: block; margin-top: 2px; }
+  .ex-card small { font-size: 12px; color: var(--text-faint); display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+  .ex-card .btn, .ex-card .chip-row { grid-column: 1 / -1; }
+  .ex-card .btn { margin-top: 8px; }
+  .ex-card .chip-row { margin-top: 10px; }
+  .ex-card.locked { opacity: .55; }
+  .visit-btn { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(140, 192, 132, .08); border: 1px solid rgba(140, 192, 132, .25); color: inherit; font: inherit; text-align: left; cursor: pointer; min-height: 52px; }
+  .visit-btn b { display: block; font-size: 13.5px; font-weight: 800; }
+  .visit-btn .sub { font-size: 12px; color: var(--text-dim); }
+  .visit-btn .go { margin-left: auto; color: var(--teal); font-weight: 800; font-size: 13px; white-space: nowrap; }
+  .melody-strip { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; margin-top: 4px; }
+  .melody-strip i { font-style: normal; font-weight: 800; font-size: 14px; padding: 5px 10px; border-radius: 999px; background: var(--bg-3); }
+  .melody-strip i:last-child { background: var(--gold-soft); color: #f5d79c; }
+  .level-pips { display: flex; gap: 5px; margin: 8px 0 2px; }
+  .level-pips i { width: 26px; height: 6px; border-radius: 3px; background: var(--locked); }
+  .level-pips i.on { background: var(--teal); }
+  .level-pips i.cur { background: var(--gold); }
+  .listen-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .listen-options .chip { justify-content: center; text-align: center; min-height: 52px; font-size: 14px; }
+  .chip.ok { border-color: var(--teal); background: rgba(140, 192, 132, .16); color: #cfe6c8; opacity: 1; }
+  .chip.bad { border-color: #c8735f; background: rgba(200, 115, 95, .14); color: #f0c2b4; opacity: 1; }
+  .listen-big { font-size: 40px; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 2px; }
+
   /* Hoja emergente (permiso de micrófono, ayuda, confirmaciones) y aviso breve */
   .sheet { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; background: rgba(6, 7, 10, 0.62); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); padding: 16px; }
   .sheet[hidden] { display: none; }
@@ -328,6 +355,7 @@
         <div class="eyebrow" id="homeTodayKicker" style="color:var(--gold);">Hoy</div>
         <div id="homeSuggestion" class="hoy-title"></div>
         <button class="btn btn-primary btn-lg" id="goPracticeBtn">Practicar</button>
+        <button class="visit-btn" id="visitBtn" hidden></button>
       </section>
       <div class="trail" id="trailList"></div>
     </section>
@@ -348,17 +376,11 @@
       </section>
     </section>
 
-    <!-- Juego -->
+    <!-- Ejercicios: para afianzar lo que ya se subió -->
     <section class="tab" id="tabJuego" hidden>
-      <h2 class="tab-title">Juego de intervalos</h2>
-      <p class="tab-sub">Te digo un intervalo y lo buscas cantando. No cuenta para la montaña: es para jugar con lo que ya conoces.</p>
-      <section class="card" id="homeGameCard" style="display:none;">
-        <div class="hint">Usa todas las notas que ya descubriste. Te aviso si te acercas («frío», «caliente»…) y, cuando la sostienes, cuenta como encontrada.</div>
-        <button class="btn btn-primary btn-lg" id="goGameBtn">Jugar</button>
-      </section>
-      <section class="card" id="gameLockedCard" style="display:none;">
-        <div class="hint" style="margin:0;">Se abre cuando llegues al primer pico (la vuelta 1 dominada): con el unísono y la octava solos todavía no hay mucho que reconocer de oído.</div>
-      </section>
+      <h2 class="tab-title">Ejercicios</h2>
+      <p class="tab-sub">Para afianzar lo que ya subiste. Cuentan para tus 5 minutos del día, pero no mueven la cordillera: eso lo hace la práctica de Hoy.</p>
+      <div id="exerciseList"></div>
     </section>
 
     <!-- Ajustes -->
@@ -395,7 +417,7 @@
         <div class="hint">Todos los ejercicios se ajustan a tu rango vocal. Si quedó mal medido, o le prestas la app a alguien, vuelve a medirlo.</div>
         <button class="btn btn-secondary" id="goTutorialBtn">Volver a registrar tu rango vocal</button>
       </section>
-      <div class="home-footer"><a href="privacidad.html">Privacidad y créditos</a><br><span style="color:var(--text-faint);font-size:12px;">Versión de prueba 0.4 · 10 oct 2026</span></div>
+      <div class="home-footer"><a href="privacidad.html">Privacidad y créditos</a><br><span style="color:var(--text-faint);font-size:12px;">Versión de prueba 0.5 · 10 oct 2026</span></div>
 
       <!-- TEMPORAL: herramientas para probar sin esperar días reales; desaparecen en la versión de verdad -->
       <details class="debug-tools" id="debugTools" hidden>
@@ -410,7 +432,7 @@
     <nav class="home-nav" id="homeNav" aria-label="Secciones">
       <button data-tab="montana" class="on"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2 19 L8 9 L11.5 13.5 L15 7 L22 19 Z"/></svg>Montaña</button>
       <button data-tab="bitacora"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3 V21"/><path d="M6.6 4 L17 7.4 L6.6 11"/></svg>Bitácora</button>
-      <button data-tab="juego"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg>Juego</button>
+      <button data-tab="juego"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></svg>Ejercicios</button>
       <button data-tab="ajustes"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7 H20 M4 17 H20"/><circle cx="9" cy="7" r="2.2" fill="#0f1a16"/><circle cx="15" cy="17" r="2.2" fill="#0f1a16"/></svg>Ajustes</button>
     </nav>
   </div>
@@ -438,11 +460,16 @@
       <div id="dayCompleteCard" class="complete-card" style="display:none;">
         <div id="dayCompleteMsg"></div>
         <button class="btn btn-secondary" id="keepPracticingBtn">Seguir practicando</button>
-        <button class="btn btn-secondary" id="completeGameBtn" style="display:none;">Ir al juego de intervalos</button>
+        <button class="btn btn-secondary" id="completeGameBtn">Ir a los ejercicios</button>
         <button class="btn btn-primary" id="advanceBtn">Concluir la lección de hoy &rarr;</button>
       </div>
 
       <div id="sessionSummary" class="session-summary" style="display:none;"></div>
+    </section>
+
+    <section class="card" id="exerciseCard" style="display:none;">
+      <div class="label" id="exerciseLabel"></div>
+      <div id="exerciseBody"></div>
     </section>
 
     <section class="card" id="modeCard">
@@ -528,6 +555,22 @@
         <input type="checkbox" id="tutorialEchoToggle">
         <label for="tutorialEchoToggle">Sin audífonos<small>Usa audífonos si puedes; si no, marca esta casilla.</small></label>
       </div>
+    </section>
+  </div>
+
+  <div id="listenView" style="display:none;">
+    <div class="view-bar">
+      <button class="back-btn" id="listenBackBtn">&larr; Inicio</button>
+      <div class="view-title">Escuchar sin cantar</div>
+    </div>
+    <section class="card">
+      <div class="eyebrow" id="listenCount"></div>
+      <div class="hoy-title" id="listenPrompt"></div>
+      <button class="btn btn-primary btn-lg" id="listenPlayBtn">Escuchar otra vez</button>
+      <div class="listen-options" id="listenOptions"></div>
+      <div class="hint" id="listenFeedback" style="margin-top:12px;"></div>
+      <button class="btn btn-secondary" id="listenNextBtn" style="display:none;">Siguiente</button>
+      <button class="btn btn-secondary" id="listenExitBtn" style="display:none;">Volver a los ejercicios</button>
     </section>
   </div>
 
@@ -958,7 +1001,13 @@ const BANDERINES = [
   { id: "composicion", name: "Primera composición", desc: "Tu primera sesión completa de Recorrido: música que antes no existía.", test: p => !!p.composed },
   { id: "mirar-atras", name: "Volviste a mirar atrás", desc: "Repasaste algo ya escalado. Desde más arriba se escucha distinto.", test: p => !!p.reviewed },
   { id: "regreso", name: "El regreso", desc: "Descansaste en el refugio y volviste a subir.", test: p => returnedFromRefuge(p) },
-  { id: "mes", name: "Un mes de constancia", desc: "Treinta días seguidos. Esto ya es parte de ti.", test: p => currentStreak(p) >= 30 }
+  { id: "mes", name: "Un mes de constancia", desc: "Treinta días seguidos. Esto ya es parte de ti.", test: p => currentStreak(p) >= 30 },
+  { id: "raices-hondas", name: "Raíces hondas", desc: "Visitaste una nota a los 60 días de dominarla, y seguía en ti.", test: p => Object.values(p.visits || {}).some(v => v.n >= 3) },
+  { id: "oido-fino", name: "Oído fino", desc: "Sostuviste una nota a menos de 6 cents del punto justo.", test: p => Object.values(p.fina || {}).some(n => n >= 3) },
+  { id: "oido-atento", name: "Oído atento", desc: "Reconociste diez de diez intervalos sin cantar, solo escuchando.", test: p => !!p.listenPerfect },
+  { id: "otra-tierra", name: "Otra tierra", desc: "Encontraste los intervalos sobre una raíz distinta de la tuya.", test: p => !!p.otherRoot },
+  { id: "cancion", name: "Una canción en el mapa", desc: "Encontraste en la red las notas de una melodía que ya conocías.", test: p => !!p.melodyDone },
+  { id: "otro-papel", name: "La misma nota, otro papel", desc: "Sostuviste tus notas mientras el dron cambiaba debajo.", test: p => !!p.dronDone }
 ].concat(LOOPS.map(l => ({
   id: "vuelta-" + l.id,
   loopId: l.id,
@@ -1345,6 +1394,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     stopHeldTone();
     stopDemo();
+    if (state.view === "listen") stopListenAudio();
     if (state.practicing) { togglePractice(); state.pausedByLeaving = true; }
     else if (state.view === "tutorial" && state.micStream) suspendTutorialMic();
   } else {
@@ -2875,24 +2925,46 @@ function gamePool() {
   return journeyNodeList().filter(n => n.id !== "unisono");
 }
 function pickGameTarget() {
-  const pool = gamePool();
-  if (!pool.length) { state.game.targetNode = null; return; }
-  let choice;
-  do { choice = pool[Math.floor(Math.random() * pool.length)]; }
-  while (pool.length > 1 && choice.id === state.game.lastTargetId);
-  state.game.targetNode = choice;
-  state.game.lastTargetId = choice.id;
-  state.game.holdSince = null;
-  state.game.missSince = null;
+  const g = state.game;
+  if (g.kind === "pares") {
+    const pairs = availablePairs();
+    if (!pairs.length) { g.targetNode = null; updateGamePrompt(); return; }
+    if (!g.pair) g.pair = pairs[g.pairIdx % pairs.length];
+    g.targetNode = makeNode(g.step % 2 === 0 ? g.pair.a : g.pair.b);
+  } else {
+    const pool = g.kind === "eco" ? ecoPool() : gamePool();
+    if (!pool.length) { g.targetNode = null; updateGamePrompt(); return; }
+    let choice;
+    do { choice = pool[Math.floor(Math.random() * pool.length)]; }
+    while (pool.length > 1 && choice.id === g.lastTargetId);
+    g.targetNode = choice;
+    g.lastTargetId = choice.id;
+  }
+  g.holdSince = null;
+  g.missSince = null;
   updateGamePrompt();
 }
 function updateGamePrompt() {
   const g = state.game;
   const hint = document.getElementById("practiceHint");
-  if (g.targetNode) {
-    hint.innerHTML = `Encuentra cantando: <b style="color:var(--gold);">${g.targetNode.name}</b> &nbsp;·&nbsp; acertadas: ${g.found}`;
+  const gold = (t) => `<b style="color:var(--gold);">${t}</b>`;
+  if (g.kind === "fina" && g.targetNode) {
+    hint.innerHTML = `Sostén ${gold(g.targetNode.name)} dentro de la franja. Cada nivel la hace más angosta.`;
+  } else if (g.kind === "melodia") {
+    hint.innerHTML = `Piensa en una canción que conozcas y empiézala en la raíz: su primera nota es el ${gold("do")} del dron. Cántala despacio; abajo se van escribiendo sus notas.`;
+  } else if (g.kind === "dron") {
+    const R = DRON_ROUNDS[g.round];
+    hint.innerHTML = `Sostén ${gold(SOLFA[R.note])} mientras el dron cambia debajo, de do a ${R.altName} y de vuelta. Tu nota no se mueve; lo que cambia es lo que significa.`;
+  } else if (!g.targetNode) {
+    hint.textContent = "Todavía no hay notas para este ejercicio.";
+  } else if (g.kind === "eco") {
+    hint.innerHTML = `Escucha la nota y repítela cantando &nbsp;·&nbsp; repetidas: ${g.found}`;
+  } else if (g.kind === "pares") {
+    const a = makeNode(g.pair.a), b = makeNode(g.pair.b);
+    const cur = g.step % 2 === 0 ? a : b, other = cur === a ? b : a;
+    hint.innerHTML = `Canta ${gold(cur.name)}, luego ${other.name} &nbsp;·&nbsp; vuelta ${Math.floor(g.step / 2) + 1} de ${PAIR_STEPS / 2}`;
   } else {
-    hint.textContent = "Juego de intervalos";
+    hint.innerHTML = `Encuentra cantando: ${gold(g.targetNode.name)} &nbsp;·&nbsp; acertadas: ${g.found}`;
   }
 }
 
@@ -2910,8 +2982,9 @@ function drawGameViz(sungCents, singing) {
   const w = canvas.lw, h = canvas.lh;
   cctx.clearRect(0, 0, w, h);
   const g = state.game;
+  const spec = TARGET_SPEC[g.kind] || TARGET_SPEC.juego;
   const axisY = h * 0.62, axisX0 = w * 0.08, axisX1 = w * 0.92;
-  const nodes = journeyNodeList();
+  const nodes = g.kind === "eco" ? ecoPool() : journeyNodeList();
   const cents = nodes.map(n => n.cents);
   const minC = Math.min(...cents) - 80, maxC = Math.max(...cents) + 80;
   const toX = (c) => lerp(axisX0, axisX1, clamp((c - minC) / (maxC - minC), 0, 1));
@@ -2930,13 +3003,28 @@ function drawGameViz(sungCents, singing) {
     cctx.fillStyle = "#34463e";
     cctx.fill();
   });
+  // notas vecinas: las dos van con nombre (una abajo y otra arriba del eje); la de ahora, en dorado
+  if (g.kind === "pares" && g.pair) {
+    const T = canvas.ts || 1;
+    [g.pair.a, g.pair.b].forEach((id, k) => {
+      const n = makeNode(id), x = toX(n.cents), cur = g.targetNode && g.targetNode.id === id;
+      cctx.beginPath();
+      cctx.arc(x, axisY, cur ? 8 : 5, 0, Math.PI * 2);
+      cctx.fillStyle = cur ? "#e6a83e" : "#8cc084";
+      cctx.fill();
+      cctx.fillStyle = cur ? "#f5d79c" : "#a7b3a6";
+      cctx.font = fpx(canvas, 12, cur ? 800 : 600);
+      cctx.textAlign = "center";
+      cctx.fillText(n.name, x, k === 0 ? axisY + 24 * T : axisY - 16 * T);
+    });
+  }
 
   if (!g.targetNode) { renderParticles(); return; }
   const target = g.targetNode;
   const tx = toX(target.cents);
   const dist = (singing && sungCents !== null) ? Math.abs(sungCents - target.cents) : Infinity;
   const held = g.holdSince !== null ? (performance.now() - g.holdSince) / 1000 : 0;
-  const lockedIn = held >= GAME_LOCK_SEC;
+  const lockedIn = held >= spec.lock;
 
   // el objetivo se ilumina cuando ya llevas rato sostenido en él (>=2s); antes de eso permanece
   // oculto entre los candidatos para que el hallazgo sea por oído
@@ -2982,12 +3070,12 @@ function drawGameViz(sungCents, singing) {
     cctx.fillStyle = "#a7b3a6";
     cctx.font = fpx(canvas, 12.5);
     cctx.textAlign = "center";
-    cctx.fillText("canta...", w / 2, orbY + 4);
+    cctx.fillText(g.listenUntil && performance.now() < g.listenUntil ? "escucha..." : "canta...", w / 2, orbY + 4);
   }
 
-  // barra de progreso de sostenimiento (0 -> 5s) cuando estás dentro
+  // barra de progreso de sostenimiento cuando estás dentro
   if (held > 0) {
-    const barW = (w * 0.5) * clamp(held / GAME_WIN_SEC, 0, 1);
+    const barW = (w * 0.5) * clamp(held / spec.win, 0, 1);
     cctx.fillStyle = lockedIn ? "#e6a83e" : "#7fb0d6";
     cctx.fillRect(w * 0.25, h * 0.86, barW, 6);
     cctx.strokeStyle = "#2a3b33";
@@ -3134,43 +3222,9 @@ function loop(ts) {
     }
     drawJourneyViz(sungCents, singing);
   } else {
-    // ---- modo Juego ----
-    const g = state.game;
-    if (!g.targetNode) pickGameTarget();
-    let sungCents = null;
-    if (singing && g.targetNode) {
-      const foldedFreq = foldFreqToRange(freq, state.root / Math.SQRT2, state.root * 2 * Math.SQRT2);
-      const rawCents = 1200 * Math.log2(foldedFreq / state.root);
-      state.smoothedJourneyCents = smoothCents(state.smoothedJourneyCents, rawCents);
-      sungCents = state.smoothedJourneyCents;
-      const dist = Math.abs(sungCents - g.targetNode.cents);
-
-      if (dist < GAME_TOL) {
-        g.missSince = null;
-        if (g.holdSince === null) g.holdSince = ts;
-        const held = (ts - g.holdSince) / 1000;
-        readout.textContent = held >= GAME_LOCK_SEC
-          ? `¡la tienes! sostén... ${held.toFixed(1)}s / ${GAME_WIN_SEC}s`
-          : `¡ahí es! sostén... ${held.toFixed(1)}s`;
-        if (held >= GAME_WIN_SEC) {
-          g.found += 1;
-          spawnBurst(canvas.lw / 2, canvas.lh * 0.4, "#e6a83e");
-          pickGameTarget();
-        }
-      } else {
-        // tropiezo breve no reinicia; salirse en firme sí
-        if (g.missSince === null) g.missSince = ts;
-        if (ts - g.missSince > GAME_GRACE_MS) { g.holdSince = null; }
-        readout.textContent = proximityWord(dist);
-      }
-    } else {
-      state.smoothedJourneyCents = null;
-      if (g.holdSince !== null && g.missSince === null) g.missSince = ts;
-      if (g.missSince !== null && ts - g.missSince > GAME_GRACE_MS) g.holdSince = null;
-      readout.textContent = "—";
-    }
-    drawGameViz(sungCents, singing && g.targetNode);
+    gameFrame(ts, dt, freq, singing, readout);
   }
+  trackVisit(dt, singing);
 
   state.rafId = requestAnimationFrame(loop);
 }
@@ -3195,6 +3249,7 @@ async function togglePractice() {
     state.dayCompleteAtStart = state.progress.todaySeconds >= EFFECTIVE_SECONDS;
     document.getElementById("dayCompleteCard").style.display = "none";
     hideSessionSummary();
+    if (state.mode === "game") onGameStart();
     btn.textContent = "Detener";
     btn.classList.add("recording");
     state.rafId = requestAnimationFrame(loop);
@@ -3210,6 +3265,7 @@ async function togglePractice() {
     document.getElementById("levelFill").classList.remove("active");
     document.getElementById("levelStatus").textContent = "—";
 
+    if (state.mode === "game") onGameStop();
     checkAndBankToday();
     saveProgress();
     if (state.mode === "journey") showSessionSummary();
@@ -3275,7 +3331,9 @@ function setMode(mode) {
   // al salir del modo escala (cualquier cambio a single/journey normal) se limpia el filtro,
   // salvo cuando el propio selector de escala vuelve a llamar setMode con la escala ya puesta
   if (mode !== "journey") { state.scaleNodes = null; state.scaleId = null; }
+  if (!isGame) restoreExerciseRoot();
   document.getElementById("intervalCard").style.display = isSingle ? "" : "none";
+  document.getElementById("exerciseCard").style.display = "none";
   updateDemoVisibility();
   document.getElementById("modeCard").style.display = isGame ? "none" : ""; // el juego es su propia pantalla
   let hint = modeDefs().find(m => m.id === mode).hint;
@@ -3286,15 +3344,21 @@ function setMode(mode) {
   } else if (state.activeLoop !== state.progress.currentLoop && !isGame) {
     hint = `Repasando ${loopById(state.activeLoop).title} — ` + hint;
   }
+  if (state.improv && state.scaleId) {
+    const m = modeById(state.scaleId);
+    hint = `Improvisa en el ${m.name}: muévete libre entre sus notas, sin buscar nada correcto. Al detenerte te muestro qué notas visitaste y cuánto te quedaste en la que le da su color: ${nameWithArticle(MODE_COLOR_NOTE[m.id])}.`;
+  }
+  if (state.visit) {
+    hint = state.visit.done ? "Visita hecha. Puedes seguir cantando o volver al inicio."
+      : `Visita de mantenimiento: canta ${visitName(state.visit.u)} un minuto, sin prisa. Basta con comprobar que sigue en ti.`;
+  }
   document.getElementById("practiceHint").textContent = hint;
   renderModeChips();
   renderScaleChips();
   rebuildMicFilters();
   updatePracticeTitle();
   if (isGame) {
-    state.game = { targetNode: null, holdSince: null, missSince: null, found: 0, lastTargetId: null, justFound: 0 };
-    pickGameTarget();
-    drawGameViz(null, false);
+    startGameKind(state.gameKind || "juego");
   } else if (isSingle) {
     drawViz(null, false);
   } else {
@@ -3307,11 +3371,13 @@ function updatePracticeTitle() {
   const el = document.getElementById("practiceTitle");
   if (!el || !state.progress) return;
   let t = "";
-  if (state.mode === "game") t = "Juego de intervalos";
+  if (state.mode === "game") t = (EXERCISES.find(x => x.id === (state.game.kind || "juego")) || {}).name || "Ejercicio";
+  else if (state.visit) t = "Visita · " + unitLabel(state.visit.u).name;
+  else if (state.improv && state.scaleId) t = "Improvisar · " + modeById(state.scaleId).name;
   else if (state.scaleId) { const sc = practiceById(state.scaleId); t = (sc.kind === "mode" ? "Modo " : "Escala ") + sc.name; }
   else if (state.mode === "journey") t = "Recorrido · " + loopById(state.activeLoop).title.replace(/ — .*/, "");
   else if (state.interval) t = state.interval.name;
-  if (state.activeLoop !== state.progress.currentLoop && state.mode !== "game") t = "Repaso · " + t;
+  if (state.activeLoop !== state.progress.currentLoop && state.mode !== "game" && !state.visit) t = "Repaso · " + t;
   el.textContent = t;
 }
 
@@ -3443,14 +3509,6 @@ document.getElementById("tutorialEchoToggle").addEventListener("change", (e) => 
   }
 });
 
-// ---- Pantalla de inicio: la montaña en espiral ----
-function nodeVisualState(loopId, nodeId) {
-  if (loopId < state.progress.currentLoop) return "mastered";
-  if (loopId > state.progress.currentLoop) return "locked";
-  if (nodeMastered(loopId, nodeId)) return "mastered";
-  if (nodeIntroduced(loopId, nodeId)) return "active";
-  return "locked";
-}
 // ---- La cordillera ----
 // El curso es una cordillera, no una sola montaña (decisión de diseño, oct-2026): se suben picos
 // que son logros intermedios rumbo a la cima. Para llegar a uno más alto a veces hay que bajar: el
@@ -3654,7 +3712,7 @@ function renderTrailList() {
           const name = unitLabel(u).name;
           let kind, sub, right;
           if (isToday) { kind = "cur"; sub = n ? `Hoy · día ${n + 1} de ${target(L)}` : "Hoy · primer contacto"; right = PIPS(n, target(L), true); }
-          else if (vs === "mastered") { kind = "done"; sub = `Vuelta ${L} · dominado`; right = PIPS(target(L), target(L)); }
+          else if (vs === "mastered") { const nv = ((p.visits || {})[nodeKey(L, u)] || {}).n || 0; kind = "done"; sub = `Vuelta ${L} · dominado` + (nv ? ` · ${nv} ${nv === 1 ? "visita" : "visitas"}` : ""); right = PIPS(target(L), target(L)); }
           else if (vs === "active") { kind = "going"; sub = `Vuelta ${L} · ${n} de ${target(L)} días`; right = PIPS(n, target(L)); }
           else { kind = "lock"; const a = est.arrival[L + ":" + u]; sub = `Vuelta ${L}` + (a !== undefined ? ` · ${enDias(a)}` : ""); right = LOCK_ICON; }
           const reach = kind !== "lock";
@@ -3728,8 +3786,8 @@ function renderHome() {
     btn.textContent = `Practicar · ${mins}`;
   } else {
     kicker.textContent = "La cima";
-    box.textContent = "Llegaste a la cima de la Parte Uno. Desde aquí repasa cualquier estación tocándola en el mapa, o juega con las doce notas.";
-    btn.textContent = "Ir al juego";
+    box.textContent = "Llegaste a la cima de la Parte Uno. Desde aquí repasa cualquier estación tocándola en el mapa, o sigue en los ejercicios: allá te espera el dron que se mueve.";
+    btn.textContent = "Ir a los ejercicios";
   }
 
   // La línea bajo la cordillera mira "el número pequeño" (Koo y Fishbach, 2012): al principio, lo
@@ -3747,9 +3805,8 @@ function renderHome() {
   }
 
   renderTrailList();
-  const unlocked = gameUnlocked();
-  document.getElementById("homeGameCard").style.display = unlocked ? "" : "none";
-  document.getElementById("gameLockedCard").style.display = unlocked ? "none" : "";
+  renderExercises();
+  renderVisit();
   updateBackupSummary();
   if (state.justRested) {
     state.justRested = false;
@@ -3762,7 +3819,16 @@ function renderHome() {
 
 function showView(view) {
   // al abandonar la práctica se corta la demo de afinaciones (si no, seguía sonando en otra vista)
-  if (state.view === "practice" && view !== "practice") stopDemo();
+  if (state.view === "practice" && view !== "practice") {
+    stopDemo();
+    stopEcoTone();
+    restoreExerciseRoot();
+    hideSessionSummary();
+    document.getElementById("dayCompleteCard").style.display = "none";
+    state.visit = null;
+    state.improv = false;
+  }
+  if (state.view === "listen" && view !== "listen") { stopListenAudio(); }
   state.view = view;
   document.body.dataset.view = view;
   if (view === "home") state.activeLoop = state.progress.currentLoop;
@@ -3770,6 +3836,7 @@ function showView(view) {
   document.getElementById("practiceView").style.display = view === "practice" ? "" : "none";
   document.getElementById("tutorialView").style.display = view === "tutorial" ? "" : "none";
   document.getElementById("lessonView").style.display = view === "lesson" ? "" : "none";
+  document.getElementById("listenView").style.display = view === "listen" ? "" : "none";
   if (view === "home") renderHome();
   // los lienzos solo se pueden medir cuando su pantalla ya es visible: se redibujan aquí
   if (view === "practice") requestAnimationFrame(redrawPracticeIdle);
@@ -3777,7 +3844,7 @@ function showView(view) {
 }
 function redrawPracticeIdle() {
   if (state.view !== "practice" || state.practicing) return;
-  if (state.mode === "game") drawGameViz(null, false);
+  if (state.mode === "game") drawGameIdle();
   else if (state.mode === "single") drawViz(null, false);
   else drawJourneyViz(null, false);
   drawDemoViz();
@@ -3808,6 +3875,7 @@ function enterPracticeFor(s) {
 function goPractice() {
   const s = state.pendingSuggestion || todaySuggestion();
   if (s.kind === "done") { setHomeTab("juego"); return; }
+  state.visit = null; state.improv = false;
   // antes de la práctica, mostrar la lección en tarjetas del intervalo/modo, o la tarjeta de
   // transición al Recorrido cuando arranca ese modo por primera vez en la vuelta
   const deck = lessonDeckFor(s);
@@ -3816,17 +3884,11 @@ function goPractice() {
   else enterPracticeFor(s);
 }
 
-// El juego es una actividad aparte de la práctica diaria (como el curso de voz): se entra desde
-// la pantalla de inicio, no desde los modos de práctica.
-function goGame() {
-  state.activeLoop = state.progress.currentLoop;
-  state.scaleNodes = null; state.scaleId = null;
-  showView("practice");
-  setMode("game");
-}
+// El juego y los demás ejercicios son actividades aparte de la práctica diaria: se entra desde
+// la pestaña de Ejercicios.
+function goGame() { startExercise("juego"); }
 
 document.getElementById("goPracticeBtn").addEventListener("click", goPractice);
-document.getElementById("goGameBtn").addEventListener("click", goGame);
 document.getElementById("goTutorialBtn").addEventListener("click", () => startRangeCapture(() => showView("home")));
 document.getElementById("tutorialExitBtn").addEventListener("click", exitTutorial);
 document.getElementById("backHomeBtn").addEventListener("click", () => {
@@ -3839,7 +3901,8 @@ document.getElementById("keepPracticingBtn").addEventListener("click", () => {
 });
 document.getElementById("completeGameBtn").addEventListener("click", () => {
   if (state.practicing) togglePractice();
-  goGame();
+  showView("home");
+  setHomeTab("juego");
 });
 document.getElementById("advanceBtn").addEventListener("click", () => {
   if (state.practicing) togglePractice();
@@ -4078,7 +4141,6 @@ function showDayComplete() {
   saveProgress();
   const msg = document.getElementById("dayCompleteMsg");
   msg.innerHTML = `<b style="color:var(--teal);">Listo por hoy.</b> Cumpliste tus 5 minutos: la lección queda completa y cuenta para tu racha. Puedes seguir cantando si tienes ganas, pero no hace falta. Aquí la constancia rinde más que hacer de más un día suelto.`;
-  document.getElementById("completeGameBtn").style.display = gameUnlocked() ? "" : "none";
   document.getElementById("dayCompleteCard").style.display = "";
   document.getElementById("dayCompleteCard").scrollIntoView({ block: "center", behavior: "smooth" });
 }
@@ -4095,6 +4157,12 @@ function showSessionSummary() {
     const pct = Math.round((r.secs / total) * 100);
     html += `<div class="session-bar-row"><span style="min-width:84px;">${r.name}</span><div class="session-bar-track"><div class="session-bar-fill" style="width:${pct}%;"></div></div><span style="min-width:34px;text-align:right;">${pct}%</span></div>`;
   });
+  const sc = state.scaleId ? practiceById(state.scaleId) : null;
+  if (sc && sc.kind === "mode" && MODE_COLOR_NOTE[sc.id]) {
+    const cid = MODE_COLOR_NOTE[sc.id], pct = Math.round(100 * (state.sessionNodeSeconds[cid] || 0) / total);
+    html += `<div style="margin-top:12px; font-size:13px; line-height:1.5;">La nota que le da su color al ${sc.name} es ${nameWithArticle(cid)}. ` +
+      (pct >= 8 ? `Le dedicaste el ${pct}% del tiempo: ahí vive el modo.` : pct > 0 ? `Le dedicaste apenas el ${pct}%: la próxima, quédate un rato en ella.` : `Hoy no pasaste por ella: la próxima, quédate un rato ahí y siente cómo tiñe todo.`) + `</div>`;
+  }
   html += '<div style="margin-top:10px; color:var(--text-dim); font-size:12px;">Aunque sean pocas notas, esto que acabas de cantar es música nueva — la estás componiendo tú, ahora, con la raíz.</div>';
   const box = document.getElementById("sessionSummary");
   box.innerHTML = html;
@@ -4392,6 +4460,756 @@ function lessonPrev() { if (lessonState.idx > 0) { lessonState.idx--; renderLess
 document.getElementById("lessonNextBtn").addEventListener("click", lessonNext);
 document.getElementById("lessonPrevBtn").addEventListener("click", lessonPrev);
 document.getElementById("lessonBackHomeBtn").addEventListener("click", () => showView("home"));
+
+// ============ Ejercicios: alargar el curso sin forzarlo ============
+// Cada ejercicio usa lo que el usuario ya sabe para aprender algo que la subida sola no da:
+// recordar a largo plazo (visitas), igualar una altura (llamada y respuesta), distinguir lo que se
+// parece (notas vecinas), percibir sin producir (escuchar sin cantar), precisión (afinación fina),
+// relación y no nota fija (otra raíz), música real (canciones), habitar un modo (improvisar) y el
+// primer paso a la Parte Dos (el dron que se mueve). Cuentan para los 5 minutos del día pero no
+// bancan días de raíz: la cordillera solo la mueve la práctica de Hoy.
+
+// Nombres de las notas en solfeo móvil: "do" es siempre la raíz del usuario.
+const SOLFA = { unisono: "do", segunda_menor: "re♭", re: "re", tercera_menor: "mi♭", tercera_mayor: "mi", cuarta: "fa", tritono: "fa♯", quinta: "sol", sexta_menor: "la♭", sexta_mayor: "la", septima_menor: "si♭", septima_mayor: "si", octava: "do" };
+// "el modo Dorian" para un modo; "la quinta justa" para un intervalo
+function visitName(u) { return LATTICE[u] ? nameWithArticle(u) : "el modo " + modeById(u).name; }
+function nameWithArticle(id) {
+  const n = LATTICE[id] ? LATTICE[id].name.toLowerCase() : id;
+  return (id === "unisono" || id === "tritono" ? "el " : "la ") + n;
+}
+// La nota que distingue a cada modo de su vecino más brillante (la que le da su color).
+const MODE_COLOR_NOTE = { lydian: "tritono", ionian: "cuarta", mixolydian: "septima_menor", dorian: "sexta_mayor", aeolian: "sexta_menor", phrygian: "segunda_menor" };
+
+function reachedModes() {
+  return MODES.filter(m => { const ml = LOOPS.find(l => l.modeId === m.id); return ml && ml.id <= state.progress.currentLoop; });
+}
+
+const EX_ICON = {
+  eco: `<path d="M5 12 a5 5 0 0 1 5 -5" /><path d="M2 12 a8 8 0 0 1 8 -8" /><circle cx="17" cy="15" r="3.4" fill="currentColor" stroke="none"/>`,
+  juego: `<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/>`,
+  escuchar: `<path d="M4 9 H8 L13 5 V19 L8 15 H4 Z"/><path d="M16.5 9 a4 4 0 0 1 0 6"/><path d="M19 6.5 a7.5 7.5 0 0 1 0 11"/>`,
+  fina: `<path d="M3 12 H21"/><path d="M9 7 V17 M15 7 V17"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/>`,
+  pares: `<circle cx="8" cy="12" r="4"/><circle cx="16" cy="12" r="4"/>`,
+  raiz: `<path d="M3 19 H11"/><path d="M13 13 H21"/><path d="M8 16 L14 10" stroke-dasharray="2 2.5"/>`,
+  modo: `<path d="M3 18 a9 9 0 0 1 18 0"/><path d="M6.5 18 a5.5 5.5 0 0 1 11 0"/><path d="M10 18 a2 2 0 0 1 4 0"/>`,
+  melodia: `<path d="M3 17 L8 12 L12 14 L16 8 L21 10"/><circle cx="8" cy="12" r="1.6" fill="currentColor"/><circle cx="16" cy="8" r="1.6" fill="currentColor"/>`,
+  dron: `<path d="M3 17 H9 V12 H15 V17 H21"/><circle cx="12" cy="6" r="2.2" fill="currentColor" stroke="none"/>`
+};
+const EXERCISES = [
+  { id: "eco", name: "Llamada y respuesta", what: "Oyes una nota y la repites cantando. Igualar una altura es la base de todo: úsalo de calentamiento.", open: () => true },
+  { id: "juego", name: "Juego de intervalos", what: "Te digo un intervalo y lo buscas cantando, con pistas de frío y caliente.", open: () => gameUnlocked(), lock: "Se abre en el primer pico." },
+  { id: "escuchar", name: "Escuchar sin cantar", what: "Suena un intervalo sobre el dron y eliges cuál es. Entrena el oído, no la voz: sirve cuando no puedes cantar.", open: () => gameUnlocked(), lock: "Se abre en el primer pico." },
+  { id: "fina", name: "Afinación fina", what: "Sostén una nota dominada dentro de una franja cada vez más angosta. Cuatro niveles por nota.", open: () => fineableNodes().length > 0, lock: "Se abre cuando domines tu primera nota." },
+  { id: "pares", name: "Notas vecinas", what: "Cantas dos intervalos parecidos, uno tras otro, hasta sentir la diferencia en el cuerpo.", open: () => availablePairs().length > 0, lock: "Se abre en el segundo pico." },
+  { id: "raiz", name: "Otra raíz", what: "El dron cambia de tonalidad. Las relaciones son las mismas, aunque las notas sean otras.", open: () => loopComplete(2), lock: "Se abre en el segundo pico." },
+  { id: "modo", name: "Improvisar en un modo", what: "Canta libre dentro de un modo. Al final te muestro qué notas visitaste y cuánto te quedaste en la que le da su color.", open: () => reachedModes().length > 0, lock: "Se abre en la cresta de los modos." },
+  { id: "melodia", name: "Canciones sobre el dron", what: "Canta el inicio de una melodía que conozcas y mira dónde vive cada una de sus notas.", open: () => loopComplete(LAST_INTERVAL_LOOP), lock: "Se abre en el pico de las doce notas." },
+  { id: "dron", name: "El dron que se mueve", what: "Sostienes una nota mientras el dron cambia debajo: la misma nota cambia de papel. Un primer paso hacia la Parte Dos.", open: () => loopComplete(LOOPS.length), lock: "Se abre en la cima." }
+];
+
+function renderExercises() {
+  const icon = (id) => `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${EX_ICON[id]}</svg>`;
+  const html = EXERCISES.map(ex => {
+    const open = ex.open();
+    let action = "";
+    if (open && ex.id === "modo") {
+      action = `<div class="chip-row">${reachedModes().map(m => `<button class="chip" data-mode="${m.id}">${m.name}</button>`).join("")}</div>`;
+    } else if (open) {
+      action = `<button class="btn btn-secondary" data-ex="${ex.id}">Empezar</button>`;
+    }
+    const extra = !open ? `<small>${LOCK_ICON}${ex.lock}</small>` : "";
+    return `<div class="ex-card${open ? "" : " locked"}"><div class="ex-ico" style="color:${open ? "var(--gold)" : "var(--text-faint)"}">${icon(ex.id)}</div><div><b>${ex.name}</b><span>${ex.what}</span>${extra}</div>${action}</div>`;
+  }).join("");
+  document.getElementById("exerciseList").innerHTML = html;
+}
+document.getElementById("exerciseList").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-ex]");
+  if (b) { startExercise(b.dataset.ex); return; }
+  const m = e.target.closest("[data-mode]");
+  if (m) startImprov(m.dataset.mode);
+});
+
+function startExercise(id) {
+  state.visit = null; state.improv = false;
+  if (id === "escuchar") { startListening(); return; }
+  state.activeLoop = state.progress.currentLoop;
+  state.scaleNodes = null; state.scaleId = null;
+  state.gameKind = id;
+  showView("practice");
+  setMode("game");
+}
+function startImprov(modeId) {
+  const mode = modeById(modeId);
+  state.visit = null;
+  state.improv = true;
+  state.activeLoop = state.progress.currentLoop;
+  state.scaleId = mode.id;
+  state.scaleNodes = mode.notes.map(makeScaleNode);
+  renderIntervalChips();
+  setMode("journey");
+  showView("practice");
+}
+
+// ---- Motor común de los ejercicios que corren en la pantalla de práctica ----
+const TARGET_SPEC = {
+  juego: { tol: GAME_TOL, lock: GAME_LOCK_SEC, win: GAME_WIN_SEC },
+  raiz: { tol: GAME_TOL, lock: GAME_LOCK_SEC, win: GAME_WIN_SEC },
+  eco: { tol: 25, lock: 1.2, win: 3 },
+  pares: { tol: 22, lock: 1.2, win: 3 }
+};
+function restoreExerciseRoot() {
+  if (state.exerciseSavedRoot) { state.root = state.exerciseSavedRoot; state.exerciseSavedRoot = null; }
+}
+function startGameKind(kind) {
+  restoreExerciseRoot();
+  stopEcoTone();
+  state.game = { kind, targetNode: null, holdSince: null, missSince: null, found: 0, lastTargetId: null,
+    baseRoot: state.root, started: false, pauseUntil: 0, listenUntil: 0,
+    pair: null, pairIdx: 0, step: 0, level: 0, notes: [], cand: null, lastRecId: null, silentSince: null,
+    round: 0, seg: 0, segStart: null, heldSecs: 0, shift: null };
+  const g = state.game;
+  if (kind === "raiz") {
+    state.exerciseSavedRoot = g.baseRoot;
+    g.shift = pickRaizShift(null);
+    state.root = g.baseRoot * g.shift.f;
+  } else if (kind === "dron") {
+    state.exerciseSavedRoot = g.baseRoot;
+  } else if (kind === "pares") {
+    g.pairIdx = Math.floor(Math.random() * Math.max(1, availablePairs().length));
+  } else if (kind === "fina") {
+    const list = fineableNodes(), fina = state.progress.fina || {};
+    // empieza por la nota menos afinada todavía
+    const pick = list.slice().sort((a, b) => (fina[a.id] || 0) - (fina[b.id] || 0))[0];
+    selectFineNode(pick ? pick.id : null, true);
+  }
+  if (kind !== "fina" && kind !== "melodia" && kind !== "dron") pickGameTarget();
+  updateGamePrompt();
+  updatePracticeTitle();
+  renderExerciseCard();
+  document.getElementById("exerciseCard").style.display = kind === "juego" ? "none" : "";
+  drawGameIdle();
+}
+function drawGameIdle() {
+  const g = state.game;
+  if (g.kind === "fina") drawFineViz(null, false, FINE_LEVELS[g.level], 0);
+  else if (g.kind === "melodia") drawJourneyViz(null, false);
+  else if (g.kind === "dron") dronDraw(null, false);
+  else drawGameViz(null, false);
+}
+function onGameStart() {
+  const g = state.game;
+  g.started = false;
+  g.holdSince = null; g.missSince = null;
+  if (g.kind === "dron") { g.seg = 0; g.segStart = null; }
+}
+function onGameStop() {
+  const g = state.game;
+  stopEcoTone();
+  g.listenUntil = 0; g.pauseUntil = 0;
+  if (g.kind === "dron") { state.root = g.baseRoot; g.seg = 0; g.segStart = null; }
+}
+
+function gameFrame(ts, dt, freq, singing, readout) {
+  const g = state.game;
+  if (g.kind === "fina") return fineFrame(ts, freq, singing, readout);
+  if (g.kind === "melodia") return melodyFrame(ts, freq, singing, readout);
+  if (g.kind === "dron") return dronFrame(ts, dt, freq, singing, readout);
+  const spec = TARGET_SPEC[g.kind] || TARGET_SPEC.juego;
+  if (!g.targetNode) pickGameTarget();
+  const now = performance.now();
+  if (g.pauseUntil) {
+    if (now < g.pauseUntil) { readout.textContent = g.pauseText || ""; drawGameViz(null, false); return; }
+    g.pauseUntil = 0;
+    if (g.kind === "eco") playEcoTarget();
+  }
+  if (g.kind === "eco" && !g.started) { g.started = true; playEcoTarget(); }
+  if (g.listenUntil && now < g.listenUntil) {
+    readout.textContent = "escucha...";
+    g.holdSince = null;
+    drawGameViz(null, false);
+    return;
+  }
+  let sungCents = null;
+  if (singing && g.targetNode) {
+    const foldedFreq = foldFreqToRange(freq, state.root / Math.SQRT2, state.root * 2 * Math.SQRT2);
+    const rawCents = 1200 * Math.log2(foldedFreq / state.root);
+    state.smoothedJourneyCents = smoothCents(state.smoothedJourneyCents, rawCents);
+    sungCents = state.smoothedJourneyCents;
+    const dist = Math.abs(sungCents - g.targetNode.cents);
+    if (dist < spec.tol) {
+      g.missSince = null;
+      if (g.holdSince === null) g.holdSince = ts;
+      const held = (ts - g.holdSince) / 1000;
+      readout.textContent = held >= spec.lock
+        ? `¡la tienes! sostén... ${held.toFixed(1)}s / ${spec.win}s`
+        : `¡ahí es! sostén... ${held.toFixed(1)}s`;
+      if (held >= spec.win) onTargetFound();
+    } else {
+      // tropiezo breve no reinicia; salirse en firme sí
+      if (g.missSince === null) g.missSince = ts;
+      if (ts - g.missSince > GAME_GRACE_MS) g.holdSince = null;
+      readout.textContent = proximityWord(dist);
+    }
+  } else {
+    state.smoothedJourneyCents = null;
+    if (g.holdSince !== null && g.missSince === null) g.missSince = ts;
+    if (g.missSince !== null && ts - g.missSince > GAME_GRACE_MS) g.holdSince = null;
+    readout.textContent = "—";
+  }
+  drawGameViz(sungCents, singing && g.targetNode);
+}
+function onTargetFound() {
+  const g = state.game, now = performance.now();
+  spawnBurst(canvas.lw / 2, canvas.lh * 0.4, "#e6a83e");
+  if (g.kind === "pares") {
+    g.step += 1;
+    if (g.step >= PAIR_STEPS) {
+      g.found += 1; g.step = 0; g.pairIdx += 1; g.pair = null;
+      g.pauseText = "Par completo. Va otro."; g.pauseUntil = now + 1600;
+      pickGameTarget();
+      renderExerciseCard();
+      return;
+    }
+    pickGameTarget();
+    return;
+  }
+  g.found += 1;
+  if (g.kind === "eco") {
+    const name = nameWithArticle(g.targetNode.id);
+    g.pauseText = `¡Eso! Era ${name}.`;
+    g.pauseUntil = now + 1700;
+  }
+  if (g.kind === "raiz" && g.found >= 3 && !state.progress.otherRoot) {
+    state.progress.otherRoot = true; saveProgress(); checkBanderines();
+  }
+  pickGameTarget();
+}
+
+// ---- Tarjeta del ejercicio (debajo del lienzo) ----
+function renderExerciseCard() {
+  const g = state.game, label = document.getElementById("exerciseLabel"), body = document.getElementById("exerciseBody");
+  const ex = EXERCISES.find(x => x.id === g.kind) || {};
+  label.textContent = ex.name || "";
+  let html = "";
+  if (g.kind === "eco") {
+    html = `<div class="hint">Primero escuchas la nota; luego la repites cantando y la sostienes. No te digo cuál es hasta que la encuentras. Con audífonos se oye mejor.</div>
+      <button class="btn btn-secondary" data-act="replay">Volver a oír la nota</button>`;
+  } else if (g.kind === "pares") {
+    const pair = g.pair || availablePairs()[g.pairIdx % Math.max(1, availablePairs().length)];
+    html = pair ? `<div class="hint">${pair.hint}</div>` : "";
+    html += `<button class="btn btn-secondary" data-act="nextpair">Otro par</button>`;
+  } else if (g.kind === "raiz") {
+    html = `<div class="hint">Hoy el dron suena ${g.shift.txt} más arriba que siempre. Todo se mide desde ahí: las relaciones son las mismas, aunque las notas sean otras. Si te queda incómodo para tu voz, cambia de raíz.</div>
+      <button class="btn btn-secondary" data-act="reroot">Cambiar de raíz</button>`;
+  } else if (g.kind === "fina") {
+    const fina = state.progress.fina || {};
+    const list = fineableNodes();
+    const best = g.targetNode ? (fina[g.targetNode.id] || 0) : 0;
+    html = `<div class="chip-row">${list.map(n => `<button class="chip${g.targetNode && n.id === g.targetNode.id ? " active" : ""}" data-act="fine" data-id="${n.id}">${n.name}${(fina[n.id] || 0) >= FINE_LEVELS.length ? " ✓" : ""}</button>`).join("")}</div>`;
+    if (g.targetNode) {
+      html += `<div class="level-pips">${FINE_LEVELS.map((t, i) => `<i class="${i < best ? "on" : i === g.level ? "cur" : ""}"></i>`).join("")}</div>
+        <div class="hint" style="margin:6px 0 0;">Nivel ${g.level + 1} de ${FINE_LEVELS.length}: sostén ${FINE_HOLD} segundos a menos de ${FINE_LEVELS[g.level]} cents del punto justo.${best >= FINE_LEVELS.length ? " Ya pasaste los cuatro con esta nota." : ""}</div>`;
+    }
+  } else if (g.kind === "melodia") {
+    html = `<div class="melody-strip" id="melodyStrip"></div>
+      <div class="hint" style="margin-top:10px;">Si una nota sale de más, no pasa nada: lo que importa es descubrir que tu canción ya vivía en este mapa.</div>
+      <button class="btn btn-secondary" data-act="clearmelody">Empezar otra canción</button>`;
+  } else if (g.kind === "dron") {
+    const R = DRON_ROUNDS[g.round];
+    html = `<div class="hint">Ronda ${g.round + 1} de ${DRON_ROUNDS.length}. Sostén ${SOLFA[R.note]}: sobre do es ${roleOf(LATTICE[R.note].ratio, 1)}; cuando el dron pasa a ${R.altName}, se vuelve ${roleOf(LATTICE[R.note].ratio, R.alt)}. No cambies tu nota: escucha cómo cambia su sentido. La barra se llena con ${DRON_ROUND_HOLD} segundos dentro.</div>`;
+  }
+  body.innerHTML = html;
+  if (g.kind === "melodia") renderMelodyStrip();
+}
+document.getElementById("exerciseCard").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const g = state.game;
+  if (b.dataset.act === "replay") playEcoTarget();
+  else if (b.dataset.act === "nextpair") { g.pairIdx += 1; g.pair = null; g.step = 0; pickGameTarget(); renderExerciseCard(); if (!state.practicing) drawGameIdle(); }
+  else if (b.dataset.act === "reroot") {
+    g.shift = pickRaizShift(g.shift);
+    state.root = g.baseRoot * g.shift.f;
+    if (state.practicing) { startDrone(); rebuildMicFilters(); }
+    renderExerciseCard();
+  }
+  else if (b.dataset.act === "fine") { selectFineNode(b.dataset.id); if (!state.practicing) drawGameIdle(); }
+  else if (b.dataset.act === "clearmelody") { g.notes = []; g.lastRecId = null; g.cand = null; renderMelodyStrip(); }
+});
+
+// ---- Llamada y respuesta ----
+const ECO_TONE_SEC = 1.8;
+let ecoTone = null;
+function ecoPool() {
+  const pool = Object.keys(LATTICE).filter(nodeReached).map(makeNode);
+  return pool.length ? pool : [makeNode("unisono")];
+}
+function playEcoTarget() {
+  const g = state.game;
+  if (!g.targetNode) return;
+  stopEcoTone();
+  const ctx = ensureAudio();
+  // a su altura real: la raíz es la nota más grave cómoda del usuario, así que cae en su voz
+  ecoTone = tone(ctx, state.root * g.targetNode.ratio, ctx.currentTime + 0.05, ECO_TONE_SEC, 0.24);
+  ecoTone.osc.type = "triangle";
+  g.listenUntil = performance.now() + (ECO_TONE_SEC + 0.35) * 1000;
+  g.holdSince = null;
+}
+function stopEcoTone() {
+  if (!ecoTone) return;
+  try {
+    const ctx = state.audioCtx;
+    ecoTone.gain.gain.cancelScheduledValues(ctx.currentTime);
+    ecoTone.gain.gain.setValueAtTime(0, ctx.currentTime);
+    ecoTone.osc.stop(ctx.currentTime + 0.02);
+  } catch (e) { /* ya había terminado */ }
+  ecoTone = null;
+}
+
+// ---- Notas vecinas ----
+const PAIR_STEPS = 6; // tres vueltas de ida y vuelta entre las dos notas
+const PAIRS = [
+  { a: "octava", b: "septima_mayor", hint: "La séptima mayor vive pegada a la octava, empujando hacia ella. Siente cómo una descansa y la otra quiere llegar." },
+  { a: "quinta", b: "tritono", hint: "El tritono está apenas debajo de la quinta. Una es tierra firme; el otro, un borde que vibra." },
+  { a: "unisono", b: "re", hint: "La raíz y el re, un paso arriba: del reposo total al primer movimiento." },
+  { a: "tercera_mayor", b: "cuarta", hint: "Medio tono las separa, y un mundo: la tercera colorea la raíz; la cuarta la mira desde el otro lado." },
+  { a: "quinta", b: "sexta_menor", hint: "La sexta menor se apoya justo encima de la quinta y quiere volver a ella." },
+  { a: "tercera_mayor", b: "tercera_menor", hint: "La misma tercera, en luz y en sombra. Pasa de una a otra despacio y siente cómo cambia el ánimo." },
+  { a: "sexta_mayor", b: "sexta_menor", hint: "Otra vez luz y sombra, ahora en la sexta: abierta y con nostalgia contra recogida y tierna." },
+  { a: "septima_mayor", b: "septima_menor", hint: "Una empuja hacia la octava; la otra se recuesta. Tensión contra descanso." },
+  { a: "unisono", b: "segunda_menor", hint: "La segunda menor casi roza la raíz. Siente el imán que la jala de vuelta." }
+];
+function availablePairs() {
+  if (!loopComplete(2)) return [];
+  return PAIRS.filter(pr => nodeReached(pr.a) && nodeReached(pr.b));
+}
+
+// ---- Otra raíz ----
+const RAIZ_SHIFTS = [{ f: 9 / 8, txt: "un tono" }, { f: 5 / 4, txt: "una tercera mayor" }, { f: 4 / 3, txt: "una cuarta" }, { f: 3 / 2, txt: "una quinta" }];
+function pickRaizShift(prev) {
+  const base = state.game.baseRoot, hi = state.progress.voiceRangeHi || base * 2.5;
+  // que la nueva raíz y lo que se canta sobre ella sigan cómodos para la voz
+  let ok = RAIZ_SHIFTS.filter(sh => base * sh.f * 1.5 <= hi && sh !== prev);
+  if (!ok.length) ok = RAIZ_SHIFTS.filter(sh => sh !== prev).slice(0, 1);
+  return ok[Math.floor(Math.random() * ok.length)];
+}
+
+// ---- Afinación fina ----
+const FINE_LEVELS = [15, 10, 6, 4]; // cents a cada lado del punto justo
+const FINE_HOLD = 4;
+function fineableNodes() {
+  return Object.keys(LATTICE).filter(id => {
+    const L = NODE_LOOP[id];
+    return L < state.progress.currentLoop || nodeMastered(L, id);
+  }).map(makeNode);
+}
+function selectFineNode(id, silent) {
+  const g = state.game;
+  g.targetNode = id ? makeNode(id) : null;
+  g.level = id ? Math.min((state.progress.fina || {})[id] || 0, FINE_LEVELS.length - 1) : 0;
+  g.holdSince = null; g.missSince = null;
+  state.smoothedDevCents = null;
+  if (!silent) { renderExerciseCard(); updateGamePrompt(); }
+}
+function fineFrame(ts, freq, singing, readout) {
+  const g = state.game, n = g.targetNode;
+  if (!n) { drawFineViz(null, false, FINE_LEVELS[0], 0); readout.textContent = "—"; return; }
+  const tol = FINE_LEVELS[g.level];
+  let dev = null;
+  if (singing) {
+    const target = state.root * n.ratio;
+    const f = isOctaveSensitive(n.ratio)
+      ? foldFreqToRange(freq, state.root / Math.SQRT2, state.root * 2 * Math.SQRT2)
+      : foldFreqToRange(freq, target / Math.SQRT2, target * Math.SQRT2);
+    state.smoothedDevCents = smoothCents(state.smoothedDevCents, 1200 * Math.log2(f / state.root) - n.cents);
+    dev = state.smoothedDevCents;
+    if (Math.abs(dev) < tol) { g.missSince = null; if (g.holdSince === null) g.holdSince = ts; }
+    else { if (g.missSince === null) g.missSince = ts; if (ts - g.missSince > 350) g.holdSince = null; }
+  } else {
+    state.smoothedDevCents = null;
+    if (g.missSince === null) g.missSince = ts;
+    if (ts - g.missSince > GAME_GRACE_MS) g.holdSince = null;
+  }
+  const held = g.holdSince !== null ? (ts - g.holdSince) / 1000 : 0;
+  readout.textContent = dev === null ? "—"
+    : Math.abs(dev) < tol ? `dentro: ${held.toFixed(1)} s de ${FINE_HOLD}`
+    : (dev > 0 ? "un poco alto" : "un poco bajo");
+  if (held >= FINE_HOLD) finePass();
+  drawFineViz(dev, singing, tol, held / FINE_HOLD);
+}
+function finePass() {
+  const g = state.game, p = state.progress, id = g.targetNode.id;
+  if (!p.fina) p.fina = {};
+  const before = p.fina[id] || 0;
+  p.fina[id] = Math.max(before, g.level + 1);
+  saveProgress();
+  checkBanderines();
+  spawnBurst(canvas.lw / 2, canvas.lh * 0.32, "#e6a83e");
+  g.holdSince = null;
+  if (g.level < FINE_LEVELS.length - 1) {
+    g.level += 1;
+    showToast(`Nivel superado. Ahora, a menos de ${FINE_LEVELS[g.level]} cents.`, 3000);
+  } else if (before < FINE_LEVELS.length) {
+    showToast(`${g.targetNode.name}: pasaste los cuatro niveles. Eso ya es oído fino.`, 4500);
+  }
+  renderExerciseCard();
+}
+// Aguja de afinación con la franja de tolerancia; también la usa "el dron que se mueve".
+function drawFineViz(dev, hasSignal, tol, barFrac, extra) {
+  fitCanvas(canvas);
+  const w = canvas.lw, h = canvas.lh, T = canvas.ts || 1;
+  cctx.clearRect(0, 0, w, h);
+  const K = 28, comp = (c) => Math.tanh(c / K);
+  const axisY = h * 0.62, x0 = w * 0.1, x1 = w * 0.9;
+  const toX = (c) => lerp(x0, x1, (comp(c) + 1) / 2);
+  if (extra && extra.top) {
+    cctx.fillStyle = extra.topColor || "#eef2e9";
+    cctx.font = fpx(canvas, 13, 800);
+    cctx.textAlign = "center";
+    cctx.fillText(extra.top, w / 2, 18 * T);
+  }
+  // franja de tolerancia
+  const a = toX(-tol), b = toX(tol);
+  cctx.fillStyle = "rgba(230, 168, 62, 0.13)";
+  cctx.fillRect(a, axisY - 26, b - a, 34);
+  cctx.strokeStyle = "rgba(230, 168, 62, 0.5)";
+  cctx.lineWidth = 1;
+  cctx.beginPath(); cctx.moveTo(a, axisY - 26); cctx.lineTo(a, axisY + 8); cctx.moveTo(b, axisY - 26); cctx.lineTo(b, axisY + 8); cctx.stroke();
+  cctx.strokeStyle = "#2a3b33";
+  cctx.lineWidth = 3;
+  cctx.beginPath(); cctx.moveTo(x0, axisY); cctx.lineTo(x1, axisY); cctx.stroke();
+  cctx.fillStyle = "#e6a83e";
+  cctx.beginPath(); cctx.arc(toX(0), axisY, 5, 0, Math.PI * 2); cctx.fill();
+  cctx.fillStyle = "#a7b3a6";
+  cctx.font = fpx(canvas, 12);
+  cctx.textAlign = "center";
+  cctx.fillText(`± ${tol} cents`, toX(0), axisY + 24 * T);
+  if (extra && extra.role) {
+    cctx.fillStyle = extra.roleColor || "#8cc084";
+    cctx.font = fpx(canvas, 13, 800);
+    cctx.fillText(extra.role, w / 2, axisY + 46 * T);
+  }
+  const orbY = h * 0.3, orbR = 30;
+  if (hasSignal && dev !== null) {
+    const absc = Math.abs(dev), inside = absc < tol;
+    const color = colorForDistance(absc, Math.max(4, tol / 2));
+    const x = toX(dev);
+    cctx.beginPath();
+    cctx.arc(x, orbY, orbR * (inside ? 1 + 0.08 * Math.sin(performance.now() / 160) : 1), 0, Math.PI * 2);
+    const grad = cctx.createRadialGradient(x, orbY, 2, x, orbY, orbR * 2);
+    grad.addColorStop(0, color); grad.addColorStop(1, "rgba(0,0,0,0)");
+    cctx.fillStyle = grad; cctx.fill();
+    cctx.beginPath(); cctx.arc(x, orbY, 9, 0, Math.PI * 2); cctx.fillStyle = color; cctx.fill();
+    if (inside) {
+      const now = performance.now();
+      if (now - state.lastBurstAt > 300) { spawnBurst(x, orbY, color); state.lastBurstAt = now; }
+    }
+  } else {
+    cctx.beginPath(); cctx.arc(w / 2, orbY, orbR * 0.7, 0, Math.PI * 2); cctx.fillStyle = "#1d2d27"; cctx.fill();
+    cctx.fillStyle = "#a7b3a6"; cctx.font = fpx(canvas, 12.5); cctx.textAlign = "center";
+    cctx.fillText("canta...", w / 2, orbY + 4);
+  }
+  if (barFrac > 0) {
+    cctx.fillStyle = barFrac >= 1 ? "#8cc084" : "#e6a83e";
+    cctx.fillRect(w * 0.25, h * 0.9, w * 0.5 * clamp(barFrac, 0, 1), 6);
+    cctx.strokeStyle = "#2a3b33";
+    cctx.strokeRect(w * 0.25, h * 0.9, w * 0.5, 6);
+  }
+  renderParticles();
+}
+
+// ---- Canciones sobre el dron ----
+function melodyFrame(ts, freq, singing, readout) {
+  const g = state.game;
+  let sung = null;
+  if (singing) {
+    g.silentSince = null;
+    const f = foldFreqToRange(freq, state.root / Math.SQRT2, state.root * 2 * Math.SQRT2);
+    state.smoothedJourneyCents = smoothCents(state.smoothedJourneyCents, 1200 * Math.log2(f / state.root));
+    sung = state.smoothedJourneyCents;
+    let nearest = null, nd = Infinity;
+    journeyNodeList().forEach(pt => { const d = Math.abs(sung - pt.cents); if (d < nd) { nd = d; nearest = pt; } });
+    if (nearest && nd < 30) {
+      if (!g.cand || g.cand.id !== nearest.id) g.cand = { id: nearest.id, since: ts };
+      else if (ts - g.cand.since > 200 && g.lastRecId !== nearest.id) {
+        g.notes.push(nearest.id);
+        if (g.notes.length > 40) g.notes.shift();
+        g.lastRecId = nearest.id;
+        renderMelodyStrip();
+        if (!state.progress.melodyDone && g.notes.length >= 8 && new Set(g.notes).size >= 4) {
+          state.progress.melodyDone = true; saveProgress(); checkBanderines();
+        }
+      }
+      readout.textContent = `en ${SOLFA[nearest.id]} · ${nearest.name.toLowerCase()}`;
+    } else {
+      readout.textContent = "entre notas...";
+    }
+  } else {
+    state.smoothedJourneyCents = null;
+    if (g.silentSince === null) g.silentSince = ts;
+    // tras un respiro, la misma nota vuelve a contar (las canciones repiten notas)
+    if (ts - g.silentSince > 250) { g.lastRecId = null; g.cand = null; }
+    readout.textContent = "—";
+  }
+  drawJourneyViz(sung, singing);
+}
+function renderMelodyStrip() {
+  const el = document.getElementById("melodyStrip");
+  if (!el) return;
+  const notes = state.game.notes || [];
+  el.innerHTML = notes.length ? notes.map(id => `<i>${SOLFA[id]}</i>`).join("") : `<span class="hint" style="margin:0;">Aquí aparecerán las notas que cantes.</span>`;
+}
+
+// ---- El dron que se mueve ----
+const DRON_ROUNDS = [
+  { note: "unisono", alt: 4 / 3, altName: "fa" },
+  { note: "unisono", alt: 3 / 2, altName: "sol" },
+  { note: "sexta_mayor", alt: 4 / 3, altName: "fa" },
+  { note: "tercera_mayor", alt: 4 / 3, altName: "fa" }
+];
+const DRON_SEG_SEC = 8, DRON_ROUND_HOLD = 24, DRON_TOL = 30;
+// qué es una nota respecto de un dron: la razón entre ambas, llevada a la misma octava
+function roleOf(noteRatio, droneRatio) {
+  let r = noteRatio / droneRatio;
+  while (r < 1 - 1e-9) r *= 2;
+  while (r >= 2 - 1e-9) r /= 2;
+  const c = 1200 * Math.log2(r);
+  const id = Object.keys(LATTICE).find(k => k !== "octava" && Math.abs(1200 * Math.log2(LATTICE[k].ratio) - c) < 3);
+  return id ? (id === "unisono" ? "la raíz misma" : nameWithArticle(id)) : "otra cosa";
+}
+// "tu la es la tercera mayor de fa" / "tu do es la raíz del dron"
+function rolePhrase(noteId, droneRatio, droneName) {
+  const r = roleOf(LATTICE[noteId].ratio, droneRatio);
+  return r === "la raíz misma" ? `tu ${SOLFA[noteId]} es la raíz del dron` : `tu ${SOLFA[noteId]} es ${r} de ${droneName}`;
+}
+function dronFrame(ts, dt, freq, singing, readout) {
+  const g = state.game, R = DRON_ROUNDS[g.round], ratio = LATTICE[R.note].ratio;
+  if (g.segStart === null) g.segStart = ts;
+  if (ts - g.segStart > DRON_SEG_SEC * 1000) {
+    g.seg ^= 1;
+    g.segStart = ts;
+    state.root = g.baseRoot * (g.seg ? R.alt : 1);
+    startDrone();
+    rebuildMicFilters();
+  }
+  let dev = null;
+  if (singing) {
+    const target = g.baseRoot * ratio;
+    const f = foldFreqToRange(freq, target / Math.SQRT2, target * Math.SQRT2);
+    state.smoothedDevCents = smoothCents(state.smoothedDevCents, 1200 * Math.log2(f / target));
+    dev = state.smoothedDevCents;
+    if (Math.abs(dev) < DRON_TOL) g.heldSecs += dt;
+  } else {
+    state.smoothedDevCents = null;
+  }
+  const droneName = g.seg ? R.altName : "do";
+  readout.textContent = rolePhrase(R.note, g.seg ? R.alt : 1, droneName);
+  if (g.heldSecs >= DRON_ROUND_HOLD) {
+    g.heldSecs = 0;
+    g.round += 1;
+    if (g.round >= DRON_ROUNDS.length) {
+      g.round = 0;
+      if (!state.progress.dronDone) { state.progress.dronDone = true; saveProgress(); checkBanderines(); }
+      showToast("Completaste las cuatro rondas. Una misma nota puede ser muchas cosas: depende de lo que suena debajo.", 6000);
+    } else {
+      const N = DRON_ROUNDS[g.round];
+      showToast(`Ronda completa. Ahora: ${SOLFA[N.note]}, con el dron entre do y ${N.altName}.`, 4000);
+    }
+    g.seg = 0; g.segStart = ts;
+    state.root = g.baseRoot;
+    startDrone(); rebuildMicFilters();
+    renderExerciseCard(); updateGamePrompt();
+  }
+  dronDraw(dev, singing);
+}
+function dronDraw(dev, singing) {
+  const g = state.game, R = DRON_ROUNDS[g.round], ratio = LATTICE[R.note].ratio;
+  const droneName = g.seg ? R.altName : "do";
+  drawFineViz(dev, singing, DRON_TOL, g.heldSecs / DRON_ROUND_HOLD, {
+    top: `El dron: ${droneName}`, topColor: g.seg ? "#7fb0d6" : "#8cc084",
+    role: rolePhrase(R.note, g.seg ? R.alt : 1, droneName).replace(/^t/, "T"),
+    roleColor: g.seg ? "#7fb0d6" : "#8cc084"
+  });
+}
+
+// ---- Escuchar sin cantar ----
+const LISTEN_ROUND = 10;
+let listenNodes = [];
+function listenPool() { return Object.keys(LATTICE).filter(id => id !== "unisono" && nodeReached(id)).map(makeNode); }
+function shuffled(arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function startListening() {
+  state.listen = { i: 0, right: 0, misses: {}, target: null, options: [], answered: false, droneOn: false };
+  showView("listen");
+  nextListenQuestion();
+}
+function nextListenQuestion() {
+  const L = state.listen, pool = listenPool();
+  document.getElementById("listenExitBtn").style.display = "none";
+  if (L.i >= LISTEN_ROUND) { showListenSummary(); return; }
+  let t;
+  do { t = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && L.target && t.id === L.target.id);
+  L.target = t;
+  L.answered = false;
+  // distractores: los más cercanos en altura, que son los que de verdad se confunden
+  const others = pool.filter(n => n.id !== t.id).sort((a, b) => Math.abs(a.cents - t.cents) - Math.abs(b.cents - t.cents)).slice(0, 3);
+  L.options = shuffled([t].concat(others));
+  document.getElementById("listenCount").textContent = `Pregunta ${L.i + 1} de ${LISTEN_ROUND} · aciertos: ${L.right}`;
+  document.getElementById("listenPrompt").textContent = "¿Qué intervalo suena sobre el dron?";
+  document.getElementById("listenPlayBtn").style.display = "";
+  document.getElementById("listenOptions").innerHTML = L.options.map(n => `<button class="chip" data-id="${n.id}">${n.name}</button>`).join("");
+  document.getElementById("listenFeedback").textContent = "";
+  document.getElementById("listenNextBtn").style.display = "none";
+  playListenTarget();
+}
+function playListenTarget() {
+  const L = state.listen;
+  if (!L || !L.target) return;
+  const ctx = ensureAudio();
+  if (!L.droneOn) { startDrone(); L.droneOn = true; }
+  stopListenTones();
+  // una octava arriba, para que destaque sobre el dron (como el botón de escuchar la nota)
+  const n = tone(ctx, state.root * L.target.ratio * 2, ctx.currentTime + 0.7, 2.2, 0.2);
+  n.osc.type = "triangle";
+  listenNodes.push(n);
+}
+function stopListenTones() {
+  const ctx = state.audioCtx;
+  listenNodes.forEach(({ osc, gain }) => { try { gain.gain.cancelScheduledValues(ctx.currentTime); gain.gain.setValueAtTime(0, ctx.currentTime); osc.stop(ctx.currentTime + 0.02); } catch (e) {} });
+  listenNodes = [];
+}
+function stopListenAudio() {
+  stopListenTones();
+  if (state.listen && state.listen.droneOn) { stopDrone(); state.listen.droneOn = false; }
+}
+function answerListen(id) {
+  const L = state.listen;
+  if (!L || L.answered) return;
+  L.answered = true;
+  const t = L.target, ok = id === t.id;
+  document.querySelectorAll("#listenOptions .chip").forEach(c => {
+    if (c.dataset.id === t.id) c.classList.add("ok");
+    else if (c.dataset.id === id) c.classList.add("bad");
+  });
+  if (ok) {
+    L.right += 1;
+    document.getElementById("listenFeedback").textContent = `Sí: es ${nameWithArticle(t.id)}.`;
+  } else {
+    const k = `${t.id}|${id}`;
+    L.misses[k] = (L.misses[k] || 0) + 1;
+    document.getElementById("listenFeedback").textContent = `Era ${nameWithArticle(t.id)}. Escúchala otra vez y compárala en tu cabeza con ${nameWithArticle(id)}.`;
+    playListenTarget();
+  }
+  L.i += 1;
+  document.getElementById("listenCount").textContent = `Pregunta ${Math.min(L.i, LISTEN_ROUND)} de ${LISTEN_ROUND} · aciertos: ${L.right}`;
+  const next = document.getElementById("listenNextBtn");
+  next.textContent = L.i >= LISTEN_ROUND ? "Ver cómo te fue" : "Siguiente";
+  next.style.display = "";
+}
+function showListenSummary() {
+  const L = state.listen;
+  stopListenAudio();
+  if (L.right === LISTEN_ROUND && !state.progress.listenPerfect) { state.progress.listenPerfect = true; saveProgress(); checkBanderines(); }
+  const worst = Object.entries(L.misses).sort((a, b) => b[1] - a[1])[0];
+  let msg = L.right === LISTEN_ROUND ? "Diez de diez. Tu oído ya reconoce estas relaciones sin necesidad de cantarlas."
+    : L.right >= 7 ? "Muy bien. Tu oído ya distingue la mayoría de estas relaciones."
+    : "Reconocer de oído es otra habilidad distinta de cantar, y se afina con el tiempo. Vuelve otro día.";
+  if (worst) {
+    const [a, b] = worst[0].split("|");
+    msg += ` Lo que más se te confundió: ${nameWithArticle(a)} con ${nameWithArticle(b)}. Si quieres, practícalas juntas en Notas vecinas.`;
+  }
+  document.getElementById("listenCount").textContent = "Resultado";
+  document.getElementById("listenPrompt").innerHTML = `<div class="listen-big">${L.right} de ${LISTEN_ROUND}</div>`;
+  document.getElementById("listenPlayBtn").style.display = "none";
+  document.getElementById("listenOptions").innerHTML = "";
+  document.getElementById("listenFeedback").textContent = msg;
+  const next = document.getElementById("listenNextBtn");
+  next.textContent = "Otra ronda";
+  next.style.display = "";
+  L.finished = true;
+  document.getElementById("listenExitBtn").style.display = "";
+}
+document.getElementById("listenOptions").addEventListener("click", (e) => {
+  const c = e.target.closest(".chip[data-id]");
+  if (c) answerListen(c.dataset.id);
+});
+document.getElementById("listenPlayBtn").addEventListener("click", playListenTarget);
+document.getElementById("listenNextBtn").addEventListener("click", () => {
+  if (state.listen && state.listen.finished) startListening();
+  else nextListenQuestion();
+});
+const leaveListen = () => { showView("home"); setHomeTab("juego"); };
+document.getElementById("listenBackBtn").addEventListener("click", leaveListen);
+document.getElementById("listenExitBtn").addEventListener("click", leaveListen);
+
+// ---- Visitas de mantenimiento (repaso espaciado) ----
+// Una estación dominada vuelve a los 7, 21 y 60 días de haberla dominado. Basta un minuto: el
+// objetivo es comprobar que sigue ahí, que es lo que más ayuda a recordar a largo plazo. Si se
+// juntan varias pendientes, se ofrece una sola por día (la más atrasada).
+const VISIT_GAPS = [7, 21, 60];
+const VISIT_SECONDS = 45;
+function masteryDate(L, u) {
+  const t = loopIsMode(L) ? MODE_DAYS_TARGET : ROOT_DAYS_TARGET;
+  const d = nodeRootDays(L, u).slice().sort();
+  return d.length >= t ? d[t - 1] : null;
+}
+function dueVisit() {
+  const p = state.progress, today = todayStr();
+  if (p.visitDate === today) return null;
+  let best = null;
+  LOOPS.forEach(l => {
+    if (l.id > p.currentLoop) return;
+    loopUnits(l.id).forEach(u => {
+      const m = masteryDate(l.id, u);
+      if (!m) return;
+      const v = (p.visits || {})[nodeKey(l.id, u)] || { n: 0 };
+      if (v.n >= VISIT_GAPS.length) return;
+      const due = addDaysStr(m, VISIT_GAPS[v.n]);
+      if (due > today) return;
+      const over = dayDiff(due, today);
+      if (!best || over > best.over) best = { L: l.id, u, n: v.n, over, since: dayDiff(m, today) };
+    });
+  });
+  return best;
+}
+function renderVisit() {
+  const btn = document.getElementById("visitBtn");
+  const v = dueVisit();
+  if (!v) { btn.hidden = true; return; }
+  btn.hidden = false;
+  btn.dataset.loop = v.L;
+  btn.dataset.node = v.u;
+  btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8cc084" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12 a8 8 0 1 0 2.4 -5.7"/><path d="M4 4 V8 H8"/></svg><span><b>Visita de mantenimiento</b><span class="sub">${unitLabel(v.u).name} · la dominaste hace ${v.since} días</span></span><span class="go">Visitar &rarr;</span>`;
+}
+document.getElementById("visitBtn").addEventListener("click", (e) => {
+  const b = e.currentTarget;
+  startVisit(parseInt(b.dataset.loop, 10), b.dataset.node);
+});
+function startVisit(L, u) {
+  state.improv = false;
+  state.visit = { L, u, key: nodeKey(L, u), secs: 0, done: false };
+  doEnterReview(L, u);
+}
+function trackVisit(dt, singing) {
+  const v = state.visit;
+  if (!v || v.done || !singing) return;
+  const near = state.mode === "single" ? (state.smoothedDevCents !== null && Math.abs(state.smoothedDevCents) < 35) : true;
+  if (!near) return;
+  v.secs += dt;
+  if (v.secs >= VISIT_SECONDS) completeVisit();
+}
+function completeVisit() {
+  const v = state.visit, p = state.progress, today = todayStr();
+  v.done = true;
+  if (!p.visits) p.visits = {};
+  const m = masteryDate(v.L, v.u), prev = (p.visits[v.key] || { n: 0 }).n;
+  const elapsed = VISIT_GAPS.filter(g => addDaysStr(m, g) <= today).length;
+  p.visits[v.key] = { n: Math.max(prev + 1, elapsed), last: today };
+  p.visitDate = today;
+  saveProgress();
+  checkBanderines();
+  showToast(`Visita hecha: ${visitName(v.u)} sigue en ti.`, 4000);
+  document.getElementById("practiceHint").textContent = "Visita hecha. Puedes seguir cantando o volver al inicio.";
+}
 
 // ---- Arranque ----
 state.progress = loadProgress();
