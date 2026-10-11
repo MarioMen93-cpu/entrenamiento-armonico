@@ -5,7 +5,7 @@
 //   última copia guardada.
 // - Drones, tipografía e íconos van "primero a lo guardado": casi no cambian y así cargan al
 //   instante. Si se cambia alguno, sube VERSION para que se vuelvan a descargar.
-const VERSION = "armonico-v5";
+const VERSION = "armonico-v6";
 const RECURSOS = [
   "./",
   "./index.html",
@@ -21,7 +21,9 @@ const RECURSOS = [
   "./iconos/icono.svg",
   "./iconos/icono-192.png",
   "./iconos/icono-512.png",
-  "./iconos/apple-touch-icon.png"
+  "./iconos/apple-touch-icon.png",
+  "./iconos/icono-maskable-512.png",
+  "./medios/despierta.mp4"
 ];
 
 self.addEventListener("install", (e) => {
@@ -58,7 +60,14 @@ self.addEventListener("fetch", (e) => {
           }
           return resp;
         })
-        .catch(() => caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match("./index.html")))
+        .catch(() => {
+          // sin conexión: la app siempre sale de "./index.html", la copia más nueva (la de "./"
+          // es la del día en que se instaló y puede ser vieja)
+          const ruta = new URL(req.url).pathname;
+          const esApp = ruta.endsWith("/") || ruta.endsWith("/index.html");
+          return (esApp ? caches.match("./index.html") : caches.match(req, { ignoreSearch: true }))
+            .then((r) => r || caches.match("./index.html"));
+        })
     );
     return;
   }
