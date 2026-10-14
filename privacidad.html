@@ -30,9 +30,10 @@
 </head>
 <body>
 <main>
+<div data-lang="es">
   <a class="back" href="./">&larr; Volver a la app</a>
   <h1>Privacidad</h1>
-  <p class="lead">Entrenamiento Armónico no te pide cuenta, no te pide datos personales y no guarda nada fuera de tu dispositivo.</p>
+  <p class="lead">Entrenamiento Armónico no te pide cuenta, no te pide datos personales y no guarda nada fuera de tu dispositivo (salvo lo mínimo para el aviso diario, si decides activarlo).</p>
 
   <section>
     <h2>El micrófono</h2>
@@ -48,7 +49,13 @@
 
   <section>
     <h2>El recordatorio</h2>
-    <p>Si agregas el recordatorio diario, queda como un evento en tu propio calendario. La app no sabe nada de él después de crearlo. Si usas el botón de Google Calendar, se abre Google con el evento ya escrito y aplica la política de privacidad de Google.</p>
+    <p>Si agregas el recordatorio a tu calendario, queda como un evento en tu propio calendario. La app no sabe nada de él después de crearlo. Si usas el botón de Google Calendar, se abre Google con el evento ya escrito y aplica la política de privacidad de Google.</p>
+    <p>Si activas el <b>aviso en este teléfono</b>, un servidor pequeño (en Cloudflare) guarda solo lo indispensable para mandártelo: la dirección de avisos que da tu navegador, la hora que elegiste, tu zona horaria y el idioma. No guarda tu nombre ni tu progreso: el texto del aviso lo arma la app en tu teléfono. Al desactivarlo, esos datos se borran.</p>
+  </section>
+
+  <section>
+    <h2>El reporte</h2>
+    <p>Para poder corregir fallas, la app anota en tu dispositivo algunos datos técnicos: errores de la app o del micrófono, los ajustes reales que dio tu micrófono y un resumen de tus últimas prácticas (cuánto tiempo estuvo abierto el micrófono, cuánto te oyó). Nada de eso sale de tu teléfono a menos que tú toques «Enviar reporte» y decidas a quién mandarlo.</p>
   </section>
 
   <section>
@@ -72,7 +79,70 @@
     <p>Tipografía <b>Manrope</b>, de Mikhail Sharanda, bajo la licencia SIL Open Font License 1.1.</p>
   </section>
 
-  <p class="fecha">Última actualización: 10 de octubre de 2026.</p>
+  <p class="fecha">Última actualización: 13 de octubre de 2026.</p>
+</div>
+<div data-lang="en" hidden>
+  <a class="back" href="./">&larr; Back to the app</a>
+  <h1>Privacy</h1>
+  <p class="lead">Harmonic Ear Training doesn't ask you for an account or any personal data, and it keeps nothing outside your device (except the bare minimum for the daily reminder, if you choose to turn it on).</p>
+
+  <section>
+    <h2>The microphone</h2>
+    <p>The app uses the microphone only while you practice or take the voice course, to know which note you're singing. The sound is analyzed in the moment, inside your device: <b>it is not recorded, not stored, and not sent anywhere</b>.</p>
+    <p>You can revoke the permission at any time in your browser's or phone's settings.</p>
+  </section>
+
+  <section>
+    <h2>Your progress</h2>
+    <p>Your progress through the mountain range, your streak, your vocal range and your flags are kept in your browser's storage, on this device. Nobody else sees them. If you clear your browser data or uninstall the app, they're deleted.</p>
+    <p>The backups you make are files or codes that you keep wherever you decide. The app keeps no copy.</p>
+  </section>
+
+  <section>
+    <h2>The reminder</h2>
+    <p>If you add the reminder to your calendar, it lives as an event in your own calendar. The app knows nothing about it after creating it. If you use the Google Calendar button, Google opens with the event already filled in, and Google's privacy policy applies.</p>
+    <p>If you turn on the <b>reminder on this phone</b>, a small server (on Cloudflare) keeps only what's needed to send it: the notification address your browser provides, the time you chose, your time zone and your language. It doesn't keep your name or your progress: the reminder's text is put together by the app on your phone. When you turn it off, that data is deleted.</p>
+  </section>
+
+  <section>
+    <h2>The report</h2>
+    <p>To be able to fix problems, the app notes some technical data on your device: app or microphone errors, the actual settings your microphone reported, and a summary of your latest practice sessions (how long the microphone was open, how much of your voice it heard). None of it leaves your phone unless you tap “Send report” and choose who to send it to.</p>
+  </section>
+
+  <section>
+    <h2>What there isn't</h2>
+    <ul>
+      <li>No accounts or sign-up.</li>
+      <li>No analytics or tracking.</li>
+      <li>No ads.</li>
+      <li>No third-party cookies.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Where the app lives</h2>
+    <p>The app's files are served from GitHub Pages, a GitHub service. Like any website, that service may log technical connection data (for example, your IP address) under its own <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">privacy statement</a>. Once installed, the app works offline.</p>
+  </section>
+
+  <h1 style="margin-top:34px;">Credits</h1>
+  <section>
+    <p>The app is inspired by <i>Harmonic Experience</i>, by W. A. Mathieu (Inner Traditions, 1997). The app's texts are original: they convey ideas from the book in new words and don't reproduce its content.</p>
+    <p><b>Manrope</b> typeface, by Mikhail Sharanda, under the SIL Open Font License 1.1.</p>
+  </section>
+
+  <p class="fecha">Last updated: October 13, 2026.</p>
+</div>
 </main>
+<script>
+  // misma elección de idioma que la app
+  (function () {
+    var lang = /^es\b/i.test(navigator.language || "es") ? "es" : "en";
+    try { var p = JSON.parse(localStorage.getItem("harmonicProgress_v1") || "{}"); if (p.settings && p.settings.lang) lang = p.settings.lang; } catch (e) {}
+    var q = new URLSearchParams(location.search).get("lang"); if (q === "es" || q === "en") lang = q;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-lang]").forEach(function (el) { el.hidden = el.getAttribute("data-lang") !== lang; });
+    if (lang === "en") document.title = "Privacy and credits · Harmonic Ear Training";
+  })();
+</script>
 </body>
 </html>

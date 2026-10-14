@@ -5,12 +5,13 @@
 //   última copia guardada.
 // - Drones, tipografía e íconos van "primero a lo guardado": casi no cambian y así cargan al
 //   instante. Si se cambia alguno, sube VERSION para que se vuelvan a descargar.
-const VERSION = "armonico-v6";
+const VERSION = "armonico-v8";
 const RECURSOS = [
   "./",
   "./index.html",
   "./privacidad.html",
   "./manifest.webmanifest",
+  "./manifest-en.webmanifest",
   "./drones/cello.mp3",
   "./drones/tanpura.mp3",
   "./drones/shruti.mp3",
@@ -36,7 +37,8 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
-      .then((claves) => Promise.all(claves.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      // el texto del aviso diario vive en su propio caché y no se borra al actualizar
+      .then((claves) => Promise.all(claves.filter((k) => k !== VERSION && k !== "armonico-aviso").map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -77,4 +79,28 @@ self.addEventListener("fetch", (e) => {
       return resp;
     }))
   );
+});
+
+// ---- Aviso diario (push) ----
+// El servidor manda un toque sin contenido; el texto lo dejó la app en el caché "armonico-aviso".
+// Siempre se muestra un aviso (iPhone lo exige): si ya cantaste hoy, la invitación es sin presión.
+self.addEventListener("push", (e) => {
+  e.waitUntil((async () => {
+    let a = null;
+    try { const r = await (await caches.open("armonico-aviso")).match("aviso.json"); if (r) a = await r.json(); } catch (err) {}
+    const d = new Date();
+    const hoy = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const en = !/^es\b/i.test(self.navigator.language || "es");
+    const body = !a ? (en ? "Five minutes with the drone." : "Cinco minutos con el dron.") : a.date === hoy ? (a.done ? a.doneText : a.today) : a.next;
+    await self.registration.showNotification((a && a.title) || (en ? "Harmonic Ear Training" : "Entrenamiento Armónico"), {
+      body, icon: "iconos/icono-192.png", badge: "iconos/icono-192.png", tag: "recordatorio-diario", renotify: true
+    });
+  })());
+});
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((lista) => {
+    const abierta = lista.find((c) => new URL(c.url).pathname.startsWith(new URL(self.registration.scope).pathname));
+    return abierta ? abierta.focus() : self.clients.openWindow("./");
+  }));
 });
