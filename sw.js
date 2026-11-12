@@ -5,7 +5,7 @@
 //   última copia guardada.
 // - Drones, tipografía e íconos van "primero a lo guardado": casi no cambian y así cargan al
 //   instante. Si se cambia alguno, sube VERSION para que se vuelvan a descargar.
-const VERSION = "armonico-v8";
+const VERSION = "armonico-v9";
 const RECURSOS = [
   "./",
   "./index.html",
